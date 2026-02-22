@@ -1,0 +1,30 @@
+# Multi-stage Dockerfile for EquiTrack Pro API
+
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
+
+COPY turbo.json ./
+COPY packages/db ./packages/db
+COPY packages/shared ./packages/shared
+COPY services/api ./services/api
+
+RUN pnpm build --filter=@equitrack/api
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod
+
+COPY --from=builder /app/services/api/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+
+EXPOSE 3001
+
+CMD ["node", "dist/main.js"]

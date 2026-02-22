@@ -1,0 +1,22 @@
+{
+    "name": "@equitrack/db",
+    "version": "0.1.0",
+    "private": true,
+    "description": "EquiTrack Pro Database Layer",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "migrate": "prisma migrate dev",
+        "generate": "prisma generate",
+        "seed": "ts-node prisma/seed.ts"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.0.0"
+    },
+    "devDependencies": {
+        "prisma": "^5.0.0",
+        "typescript": "^5.0.0",
+        "@types/node": "^20.0.0",
+        "ts-node": "^10.0.0"
+    }
+}

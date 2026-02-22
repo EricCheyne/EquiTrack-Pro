@@ -1,0 +1,22 @@
+{
+    "name": "equitrack-pro",
+    "version": "0.1.0",
+    "private": true,
+    "description": "EquiTrack Pro - Monorepo",
+    "scripts": {
+        "build": "turbo build",
+        "dev": "turbo dev",
+        "lint": "turbo lint",
+        "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+        "test": "turbo test"
+    },
+    "workspaces": [
+        "apps/*",
+        "services/*",
+        "packages/*"
+    ],
+    "devDependencies": {
+        "turbo": "latest",
+        "prettier": "^3.0.0"
+    }
+}
