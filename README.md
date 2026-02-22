@@ -23,12 +23,37 @@ A monorepo for the EquiTrack Pro platform built with [Turbo](https://turbo.build
 ### Prerequisites
 - Node.js 18+
 - pnpm (recommended) or npm
+- Docker & Docker Compose (for local database services)
 
 ### Installation
 
 ```bash
 pnpm install
 ```
+
+### Setup Local Environment
+
+Copy the environment example file:
+
+```bash
+cp .env.example .env.local
+```
+
+### Start Database Services
+
+Start PostgreSQL 15 and Redis 7 with Docker Compose:
+
+```bash
+docker-compose -f infra/docker/docker-compose.yml up -d
+```
+
+Verify services are running:
+
+```bash
+docker-compose -f infra/docker/docker-compose.yml ps
+```
+
+See [infra/docker/README.md](./infra/docker/README.md) for detailed Docker setup and troubleshooting.
 
 ### Development
 
