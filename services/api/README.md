@@ -257,12 +257,39 @@ export class CreateUserDto {
 
 ## Testing
 
-Run the test suite:
+### Unit Tests
+
+Run the unit test suite:
 
 ```bash
 pnpm test
 pnpm test --watch
 pnpm test --coverage
+```
+
+The API includes comprehensive unit tests for all observability components.
+
+### Integration Tests
+
+Run integration tests with Testcontainers and PostgreSQL:
+
+```bash
+pnpm test:integration
+```
+
+Integration tests verify:
+- Health endpoints (`/health`, `/health/ping`)
+- Database connectivity via Prisma
+- CRUD operations
+- Transactions and error handling
+- Request correlation IDs
+
+**See [INTEGRATION-TESTS.md](./INTEGRATION-TESTS.md) for detailed documentation.**
+
+Or use docker-compose alternative:
+
+```bash
+pnpm test:integration:docker
 ```
 
 ## Building for Production
@@ -448,17 +475,24 @@ pnpm test -- --coverage
 
 ### Test Coverage
 
-The following components have full test coverage:
+The API includes comprehensive test coverage:
 
+**Unit Tests:**
 - **StructuredLoggerService** - All logging methods, context management, metadata formatting
 - **RequestIdMiddleware** - UUID generation, header management, request augmentation
 - **GlobalExceptionFilter** - Exception handling, RFC 7807 formatting, error logging
 - **HttpLoggingInterceptor** - Request/response logging, timing measurement, error handling
 
-### Example Test
+**Integration Tests:**
+- **Health Endpoints** - Verify API responsiveness and health status
+- **Database Connectivity** - Test Prisma operations, CRUD, transactions
+- **Request Correlation** - Validate request ID generation and inclusion
+- **Error Handling** - Test constraint violations and validation errors
+- **Smoke Tests** - Performance and reliability verification
 
-Tests verify that the observability stack works correctly:
+### Example Test Output
 
+Unit Tests:
 ```
 ✓ StructuredLoggerService (5 tests)
   ✓ should be defined
@@ -474,20 +508,20 @@ Tests verify that the observability stack works correctly:
   ✓ should set x-request-id header in response
   ✓ should call next middleware
   ✓ should generate unique IDs for different requests
+```
 
-✓ GlobalExceptionFilter (10 tests)
-  ✓ should handle BadRequestException with validation errors
-  ✓ should handle NotFoundException
-  ✓ should include RFC 7807 required fields
-  ✓ should include request ID in error response
-  ✓ should format validation errors correctly
+Integration Tests:
+```
+✓ Health Endpoints (16 tests)
+  ✓ GET /health returns 200 with health status
+  ✓ GET /health includes request ID header
+  ✓ GET /health/ping returns simple response
 
-✓ HttpLoggingInterceptor (8 tests)
-  ✓ should log successful response
-  ✓ should measure request duration
-  ✓ should handle errors from handler
-  ✓ should pass through response data
-  ✓ should re-throw errors after logging
+✓ Database Connectivity (30+ tests)
+  ✓ should query database
+  ✓ should create and read records
+  ✓ should handle transactions
+  ✓ should validate constraints
 ```
 
 ## Best Practices
@@ -502,7 +536,8 @@ Tests verify that the observability stack works correctly:
 
 ## Documentation
 
-- **[TESTING.md](./TESTING.md)** - Comprehensive testing guide with examples and best practices
+- **[INTEGRATION-TESTS.md](./INTEGRATION-TESTS.md)** - Integration testing guide with Testcontainers and Docker Compose
+- **[TESTING.md](./TESTING.md)** - Unit testing guide with examples and best practices
 - **[NestJS Documentation](https://docs.nestjs.com)** - NestJS framework documentation
 - **[RFC 7807 Problem Details](https://datatracker.ietf.org/doc/html/rfc7807)** - Standard error response format
 - **[Swagger/OpenAPI](https://swagger.io)** - API documentation standard

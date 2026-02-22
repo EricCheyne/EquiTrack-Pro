@@ -1,0 +1,39 @@
+# Dockerfile for running API integration tests
+# Usage: docker build -f Dockerfile.test -t equitrack-api-test .
+# Then: docker run -e DATABASE_URL=... equitrack-api-test
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy root package files
+COPY package.json .
+COPY pnpm-lock.yaml .
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy monorepo packages
+COPY packages packages
+COPY services services
+COPY apps apps
+
+# Build packages first
+WORKDIR /app/packages/db
+RUN pnpm db:generate
+
+WORKDIR /app/packages/shared
+RUN pnpm build
+
+# Install API dependencies
+WORKDIR /app/services/api
+RUN pnpm install
+
+# Check for database connectivity setup
+ENV DATABASE_URL=${DATABASE_URL:-postgresql://testuser:testpass@postgres:5432/equitrack_test}
+
+# Run integration tests
+CMD ["pnpm", "test:integration"]
