@@ -2,9 +2,12 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
+import { StructuredLoggerService } from "./common/services/structured-logger.service";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    const logger = app.get(StructuredLoggerService);
 
     // Enable CORS
     app.enableCors();
@@ -21,6 +24,10 @@ async function bootstrap() {
         })
     );
 
+    // Global exception filter
+    const exceptionFilter = app.get(GlobalExceptionFilter);
+    app.useGlobalFilters(exceptionFilter);
+
     // Swagger/OpenAPI documentation
     const config = new DocumentBuilder()
         .setTitle("EquiTrack Pro API")
@@ -34,10 +41,16 @@ async function bootstrap() {
     SwaggerModule.setup("api/docs", app, document);
 
     const port = process.env.API_PORT || 3001;
-    await app.listen(port);
+    const host = process.env.API_HOST || "localhost";
 
-    console.log(`✓ EquiTrack Pro API running on http://localhost:${port}`);
-    console.log(`✓ Swagger UI available at http://localhost:${port}/api/docs`);
+    await app.listen(port, host);
+
+    logger.log("✓ EquiTrack Pro API started", "Bootstrap", {
+        port,
+        host,
+        nodeEnv: process.env.NODE_ENV,
+    });
+    logger.log(`✓ Swagger UI available at http://${host}:${port}/api/docs`, "Bootstrap");
 }
 
 bootstrap().catch((err) => {
