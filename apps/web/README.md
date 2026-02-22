@@ -50,10 +50,119 @@ components/
 └── ...                     # Other components
 
 lib/
-└── utils.ts               # Utility functions (cn helper)
+├── api/                    # Typed API client
+│   ├── index.ts            # Main export
+│   ├── types.ts            # Types and errors
+│   ├── client.ts           # Core ApiClient
+│   ├── hooks.ts            # React hooks
+│   ├── server.ts           # Server-side helpers
+│   ├── examples.ts         # Usage examples
+│   └── API-CLIENT.md       # API client docs
+├── utils.ts               # Utility functions (cn helper)
+└── ...
 
 public/                    # Static assets
 ```
+
+## API Client
+
+The web app includes a **fully-typed API client** with fetch + zod validation.
+
+### Features
+
+- ✅ Type-safe requests and responses
+- ✅ Works in both server and client components
+- ✅ React hooks for data fetching and mutations
+- ✅ Automatic error handling with validation details
+- ✅ Request correlation with UUIDs
+- ✅ Retry logic and refetch strategies
+- ✅ Server-side helpers for server actions
+- ✅ Pagination and debounced search
+
+### Quick Examples
+
+**Client Component - Fetch Data:**
+
+```typescript
+'use client';
+
+import { useApi } from '@/lib/api';
+import { PropertyListSchema } from '@equitrack/shared';
+
+export function PropertyList() {
+  const { data, isLoading, error } = useApi(
+    '/properties',
+    PropertyListSchema
+  );
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <ul>
+      {data?.items?.map(property => (
+        <li key={property.id}>{property.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**Client Component - Mutations:**
+
+```typescript
+const { mutate, isPending } = useMutation(
+  '/properties',
+  'post',
+  PropertySchema
+);
+
+await mutate({ name: 'Farm', type: 'LAND' });
+```
+
+**Server Component:**
+
+```typescript
+import { serverFetch } from '@/lib/api';
+
+export default async function PropertyPage() {
+  const { data } = await serverFetch(
+    '/properties',
+    PropertyListSchema
+  );
+
+  return <PropertyList items={data?.items} />;
+}
+```
+
+**Server Action:**
+
+```typescript
+'use server';
+
+import { serverApi } from '@/lib/api';
+
+export async function createProperty(formData: FormData) {
+  const response = await serverApi().post(
+    '/properties',
+    Object.fromEntries(formData),
+    PropertySchema
+  );
+  return response.data;
+}
+```
+
+### Documentation
+
+For comprehensive documentation, see [API-CLIENT.md](./API-CLIENT.md).
+
+Key pages:
+- [useApi Hook](./API-CLIENT.md#useapi---data-fetching) - Data fetching with loading states
+- [useMutation Hook](./API-CLIENT.md#usemutation---createupdatedelete) - Create/update/delete
+- [usePaginated Hook](./API-CLIENT.md#usepaginated---pagination) - Pagination
+- [Server Helpers](./API-CLIENT.md#server-side-helpers) - Server actions and components
+- [Error Handling](./API-CLIENT.md#error-handling) - RFC 7807 Problem Details
+- [Advanced Patterns](./API-CLIENT.md#advanced-patterns) - Optimistic updates, dependent queries
 
 ## Features
 
