@@ -1,0 +1,9 @@
+# Prisma.io configurations
+generator client {
+  provider = "prisma-client-js"
+  # Useful for development
+  output   = "../../../node_modules/.prisma/client"
+}
+
+# Optional: schema file location
+# schemaPath = "./prisma/schema.prisma"
