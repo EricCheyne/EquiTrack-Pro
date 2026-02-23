@@ -2,58 +2,73 @@
 // https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // User model - represents application users
 model User {
-    id        String   @id @default(cuid())
-    email     String   @unique
-    name      String?
-    password  String // Make sure to hash in application
-    role      Role     @default(USER)
-    active    Boolean  @default(true)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String?
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  memberships Membership[]
 
-    @@index([email])
-    @@index([role])
+  @@index([email])
 }
 
-enum Role {
-    ADMIN
-    MANAGER
-    USER
+// Org model - represents organizations
+model Org {
+  id          String       @id @default(uuid())
+  name        String
+  slug        String       @unique
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  memberships Membership[]
+
+  @@index([slug])
 }
 
-// Example models - customize based on your domain
-model Organization {
-    id          String   @id @default(cuid())
-    name        String
-    slug        String   @unique
-    description String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+// Membership model - represents user's role in an organization
+model Membership {
+  id        String   @id @default(uuid())
+  role      OrgRole  @default(MEMBER)
+  userId    String
+  orgId     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org       Org      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([slug])
+  @@unique([userId, orgId])
+  @@index([userId])
+  @@index([orgId])
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
 }
 
 model AuditLog {
-    id        String   @id @default(cuid())
-    action    String
-    entity    String
-    entityId  String
-    changes   Json?
-    userId    String?
-    createdAt DateTime @default(now())
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String
+  changes   Json?
+  userId    String?
+  createdAt DateTime @default(now())
 
-    @@index([userId])
-    @@index([entity])
-    @@index([entityId])
-    @@index([createdAt])
+  @@index([userId])
+  @@index([entity])
+  @@index([entityId])
+  @@index([createdAt])
 }
