@@ -1,8 +1,10 @@
 // Re-export Prisma client and types for use in other packages
-export { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+export { PrismaClient };
 export type {
     User,
-    Organization,
+    Org,
+    Membership,
     AuditLog,
     Prisma,
 } from "@prisma/client";

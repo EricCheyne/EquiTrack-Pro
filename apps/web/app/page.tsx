@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BarChart3, Clock, Users } from "lucide-react";
+import { AuthButton } from "@/components/auth-button";
 
 export default function Home() {
     return (
@@ -16,9 +17,7 @@ export default function Home() {
                             <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
                                 Dashboard
                             </Link>
-                            <button className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                                Sign In
-                            </button>
+                            <AuthButton />
                         </div>
                     </div>
                 </div>
